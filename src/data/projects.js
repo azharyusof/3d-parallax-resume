@@ -7,14 +7,14 @@ import wmsDashboard from '../assets/wms_dashboard.png'
 import wmsShift from '../assets/wms_shift.png'
 import wmsOvertime from '../assets/wms_overtime.png'
 
-export const projectFiltersData = ['All', 'Full-Stack', 'Frontend', 'Tools', 'DevOps']
+export const projectFiltersData = ['All', 'Mobile', 'Full-Stack', 'DevOps']
 
 export const projectsData = [
   {
     title: 'MYSIRIM',
     company: 'SIRIM QAS International Sdn Bhd',
     description: 'Cross-platform mobile application deployed on major stores, enabling consumers to verify product authenticity, certifications, and access detailed data sheets.',
-    category: 'Frontend',
+    category: 'Mobile',
     tech: ['Flutter', '.NET 8', 'MSSQL', 'REST APIs'],
     gradient: 'linear-gradient(135deg, #10b981, #059669)',
     demoUrl: 'https://example.com',
@@ -25,7 +25,7 @@ export const projectsData = [
     title: 'Vending Machine System (VMS)',
     company: 'XOX Technology Berhad',
     description: 'IoT vending machine integration managing payment gateways, digital product catalogs, remote hardware telemetry, and machine maintenance APIs.',
-    category: 'Full-Stack',
+    category: 'Mobile',
     tech: ['Android Native', 'Laravel', 'MySQL', 'Java / Kotlin'],
     gradient: 'linear-gradient(135deg, #f59e0b, #eab308)',
     demoUrl: 'https://example.com',
@@ -58,7 +58,7 @@ export const projectsData = [
     title: 'Travel Management (Edgenta Travel)',
     company: 'UEM Edgenta Berhad',
     description: 'Organisational travel booking portal streamlining flight, accommodation, transport scheduling, and claim workflows for corporate staff.',
-    category: 'Frontend',
+    category: 'Full-Stack',
     tech: ['Vue.js', '.NET Core', 'MSSQL', 'Bootstrap'],
     gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
     demoUrl: 'https://example.com',
@@ -91,7 +91,7 @@ export const projectsData = [
     title: 'Palm Fruit Grading System',
     company: 'Felda Prodata System Sdn Bhd',
     description: 'Weighing bridge integration and fruit grading system automating thermal receipt printing and regional management reporting.',
-    category: 'Tools',
+    category: 'Full-Stack',
     tech: ['.NET MVC', 'MSSQL', 'C#', 'Hardware Integration'],
     gradient: 'linear-gradient(135deg, #f43f5e, #ec4899)',
     demoUrl: 'https://example.com',
@@ -102,7 +102,7 @@ export const projectsData = [
     title: 'FELDA GIS Plantation System',
     company: 'Felda Prodata System Sdn Bhd',
     description: 'Geospatial plantation dashboard mapping oil palm trees, asset coordinates, and residential areas in FELDA sectors.',
-    category: 'Frontend',
+    category: 'Full-Stack',
     tech: ['React.js', 'Laravel', 'MSSQL', 'GIS / Leaflet'],
     gradient: 'linear-gradient(135deg, #06b6d4, #10b981)',
     demoUrl: 'https://example.com',

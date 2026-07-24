@@ -190,7 +190,7 @@ export const skillsData = [
     name: 'LLM & AI Agent Integration',
     category: 'ai',
     level: 88,
-    tag: 'AI AGENTS & LLMS',
+    tag: 'AI AGENT & LLM',
     color: '#10a37f',
     svg: `<svg viewBox="0 0 100 100" width="28" height="28"><circle cx="50" cy="50" r="35" fill="none" stroke="#10a37f" stroke-width="6"/><circle cx="50" cy="50" r="15" fill="#10a37f"/><path stroke="#10a37f" stroke-width="6" d="M50 5v10M50 85v10M5 50h10M85 50h10"/></svg>`
   }
