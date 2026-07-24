@@ -1,0 +1,409 @@
+:root {
+  /* Core Theme Colors */
+  --bg-primary: #08090f;
+  --bg-gradient: radial-gradient(circle at 50% 50%, #0c0f1d 0%, #05060a 100%);
+  
+  --accent-cyan: #06b6d4;
+  --accent-indigo: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dark: #64748b;
+  
+  --glass-bg: rgba(13, 17, 28, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --glass-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  
+  /* Font Families */
+  --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk', monospace;
+  
+  /* Layout Dimensions */
+  --header-height: 80px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: clip; /* Using clip instead of hidden to avoid breaking viewport-level scroll snapping */
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background-color: var(--bg-primary);
+  background-image: var(--bg-gradient);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom High-Tech Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(13, 17, 28, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 254, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+}
+
+/* Utility Layouts */
+.section {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 80px 10%;
+  z-index: 1;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+  .section {
+    padding: 90px 6% 60px 6%;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    overflow-y: auto; /* Allow scrolling inside section if content overflows mobile screens */
+    scroll-snap-align: start;
+  }
+}
+
+/* ============================================================
+   Liquid Glass 3D Card System
+   ::before = specular highlight layer (moves with JS via background)
+   ::after  = bottom inner-glow edge
+   All child content stays flat (no preserve-3d) — zero alignment shift
+   ============================================================ */
+.glass-panel,
+.glass-card,
+.skill-brand-card,
+.project-slide-card,
+.timeline-card,
+.cert-slide-card {
+  position: relative;
+  isolation: isolate;          /* New stacking context — ::before stays inside */
+  will-change: transform;
+  transition:
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Specular highlight layer — dynamically updated by JS composable */
+.glass-panel::before,
+.glass-card::before,
+.skill-brand-card::before,
+.project-slide-card::before,
+.timeline-card::before,
+.cert-slide-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  /* Default: soft top-left highlight (static when no JS tilt active) */
+  background: radial-gradient(
+    circle at 25% 20%,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    transparent 70%
+  );
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+/* Top inner rim light — always-on glass edge illusion */
+.glass-panel::after,
+.glass-card::after,
+.skill-brand-card::after,
+.project-slide-card::after,
+.timeline-card::after,
+.cert-slide-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 4%;
+  right: 4%;
+  height: 1px;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.22) 30%,
+    rgba(255, 255, 255, 0.28) 50%,
+    rgba(255, 255, 255, 0.22) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Glassmorphism Styles */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    var(--glass-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 1px 0 rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  padding: 30px;
+  overflow: hidden;             /* Clip the ::before specular within rounded corners */
+}
+
+.glass-panel:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow:
+    0 10px 40px 0 rgba(99, 102, 241, 0.10),
+    var(--glass-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 20px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(99, 102, 241, 0.20);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+
+/* Typography Utilities */
+.text-glow {
+  text-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animated-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Responsive Canvas Wrapper */
+.canvas-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* --- Timeline Styling --- */
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 30px;
+  margin-top: 20px;
+  border-left: 2px dashed rgba(255, 255, 255, 0.08);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 40px;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -41px;
+  top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.marker-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 3px solid var(--accent-indigo);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.timeline-item:hover .marker-dot {
+  transform: scale(1.25);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 15px var(--accent-cyan);
+}
+
+/* --- Project Filters --- */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.filter-tab {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 8px 20px;
+  border-radius: 30px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.filter-tab.active,
+.filter-tab:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--accent-indigo);
+  color: var(--text-main);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+}
+
+/* --- Certificates Grid --- */
+.certs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.cert-theme-tag {
+  font-size: 0.7rem;
+  font-family: var(--font-display);
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  color: var(--accent-cyan);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.cert-card-header {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.cert-icon-container {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cert-title-meta h3 {
+  font-size: 1.05rem;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.cert-issuer {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.cert-info-block {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cert-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.cert-info-icon {
+  width: 12px;
+  height: 12px;
+  color: var(--accent-indigo);
+}
