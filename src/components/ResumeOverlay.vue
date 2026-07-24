@@ -20,18 +20,7 @@
           <span class="nav-name">{{ sec.name }}</span>
         </a>
       </nav>
-      <div class="hud-controls">
-        <button 
-          class="audio-toggle-btn" 
-          :class="{ active: isAudioEnabled }" 
-          @click="toggleAudio"
-          @mouseenter="triggerHoverSound"
-          :title="isAudioEnabled ? 'Mute Interface Sound' : 'Enable Interface Sound'"
-        >
-          <component :is="isAudioEnabled ? Volume2 : VolumeX" class="btn-icon" />
-          <span class="btn-text d-none-mobile">{{ isAudioEnabled ? 'AUDIO_ON' : 'AUDIO_MUTED' }}</span>
-        </button>
-      </div>
+      <div class="hud-controls"></div>
     </header>
 
     <!-- Side Navigation HUD Indicators -->
