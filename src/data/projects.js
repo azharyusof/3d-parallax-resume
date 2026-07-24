@@ -7,7 +7,7 @@ import wmsDashboard from '../assets/wms_dashboard.png'
 import wmsShift from '../assets/wms_shift.png'
 import wmsOvertime from '../assets/wms_overtime.png'
 
-export const projectFiltersData = ['All', 'Mobile', 'Full-Stack', 'DevOps']
+export const projectFiltersData = ['All', 'Mobile', 'Full-Stack', 'DevOps', 'IoT']
 
 export const projectsData = [
   {
@@ -25,7 +25,7 @@ export const projectsData = [
     title: 'Vending Machine System (VMS)',
     company: 'XOX Technology Berhad',
     description: 'IoT vending machine integration managing payment gateways, digital product catalogs, remote hardware telemetry, and machine maintenance APIs.',
-    category: 'Mobile',
+    category: 'IoT',
     tech: ['Android Native', 'Laravel', 'MySQL', 'Java / Kotlin'],
     gradient: 'linear-gradient(135deg, #f59e0b, #eab308)',
     demoUrl: 'https://example.com',
