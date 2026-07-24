@@ -56,15 +56,9 @@
     <section id="hero" class="section hero-section">
       <div class="hero-card-wrapper animated-float">
         <div 
-          ref="heroCardRef"
+          :ref="bindHeroCard"
           class="glass-panel hero-panel"
-          :style="{ transform: tiltTransform }"
-          @mousemove="handleMouseMove"
-          @mouseleave="handleMouseLeave"
         >
-          <!-- Spotlight Glow -->
-          <div class="spotlight-glow" :style="glowStyle"></div>
-
           <!-- Liquid Drift Colors Background -->
           <div class="liquid-bg-layer"></div>
 
@@ -604,6 +598,7 @@ import {
 } from '../utils/audio'
 
 // ─── Liquid Glass Tilt Composables (per card group) ───────────────
+const { bindCard: bindHeroCard } = useLiquidGlass({ maxTilt: 4, intensity: 0.22 })
 const { addCard: addSkillCard } = useLiquidGlass({ maxTilt: 6, intensity: 0.30 })
 const { bindCard: bindTimelineCard } = useLiquidGlass({ maxTilt: 4, intensity: 0.22 })
 const { addCard: addProjectCard } = useLiquidGlass({ maxTilt: 5, intensity: 0.28 })
@@ -1025,71 +1020,6 @@ END:VCARD`
   }
 }
 
-// Interactive Mouse Tilt & Glow Parallax for Hero Card (Solid card 3D tilt, fixed internal layout)
-const heroCardRef = ref(null)
-const tiltTransform = ref('perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)')
-const glowStyle = ref({ opacity: 0, display: 'none' })
-
-let targetRotX = 0
-let targetRotY = 0
-let currRotX = 0
-let currRotY = 0
-let isHoveringHero = false
-let tiltAnimFrame = null
-
-const updateTiltLoop = () => {
-  if (!isHoveringHero && Math.abs(currRotX) < 0.01 && Math.abs(currRotY) < 0.01) {
-    currRotX = 0
-    currRotY = 0
-    tiltTransform.value = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
-    return
-  }
-
-  // Smooth lerp (0.08) for liquid 60 FPS tilt motion
-  currRotX += (targetRotX - currRotX) * 0.08
-  currRotY += (targetRotY - currRotY) * 0.08
-
-  tiltTransform.value = `perspective(1000px) rotateX(${currRotX.toFixed(2)}deg) rotateY(${currRotY.toFixed(2)}deg) scale3d(1, 1, 1)`
-
-  if (isHoveringHero || Math.abs(currRotX) > 0.01 || Math.abs(currRotY) > 0.01) {
-    tiltAnimFrame = requestAnimationFrame(updateTiltLoop)
-  }
-}
-
-const handleMouseMove = (e) => {
-  if (!heroCardRef.value) return
-  const card = heroCardRef.value
-  const rect = card.getBoundingClientRect()
-  
-  const x = e.clientX - rect.left
-  const y = e.clientY - rect.top
-  
-  const normalizedX = (x / rect.width) - 0.5
-  const normalizedY = (y / rect.height) - 0.5
-  
-  targetRotX = -normalizedY * 6 // Gentle 6-deg max tilt for solid card 3D depth
-  targetRotY = normalizedX * 6
-  
-  if (!isHoveringHero) {
-    isHoveringHero = true
-    tiltAnimFrame = requestAnimationFrame(updateTiltLoop)
-  }
-
-  glowStyle.value = {
-    display: 'block',
-    opacity: 1,
-    left: `${x}px`,
-    top: `${y}px`
-  }
-}
-
-const handleMouseLeave = () => {
-  isHoveringHero = false
-  targetRotX = 0
-  targetRotY = 0
-  glowStyle.value = { display: 'none', opacity: 0 }
-}
-
 onMounted(() => {
   runTypingEffect()
 })
@@ -1383,12 +1313,23 @@ onMounted(() => {
   }
 }
 
-/* Hero profile and content panes must sit above the z:0 background layers */
-.hero-profile-pane,
+.hero-card-wrapper:hover {
+  animation-play-state: paused;
+}
+
+/* Hero profile and content panes sit above z:0 background layers */
+.hero-profile-pane {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 240px;
+}
+
 .hero-content-pane {
   position: relative;
-  z-index: 1;
-  /* NO transform-style:preserve-3d — keeps inner content flat and stable */
+  z-index: 2;
+  flex: 1;
+  min-width: 0;
 }
 
 /* Ensure hero inner elements don't shift on 3D tilt — lock all children */
