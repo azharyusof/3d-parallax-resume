@@ -2,7 +2,8 @@ export const skillCategoriesData = [
   { id: 'all', name: 'ALL TECH & SKILLS' },
   { id: 'frontend', name: 'FRONTEND & MOBILE' },
   { id: 'backend', name: 'BACKEND & DATABASES' },
-  { id: 'devops', name: 'DEVOPS & CLOUD' }
+  { id: 'devops', name: 'DEVOPS & CLOUD' },
+  { id: 'ai', name: 'AI & AUTOMATION' }
 ]
 
 export const skillsData = [
@@ -81,6 +82,24 @@ export const skillsData = [
     color: '#00758f',
     svg: `<svg viewBox="0 0 100 100" width="28" height="28"><path fill="#00758f" d="M50 15C30 15 15 30 15 50c0 15 10 28 24 33l5-12c-8-3-14-11-14-21 0-12 10-22 20-22s20 10 20 22c0 10-6 18-14 21l5 12c14-5 24-18 24-33 0-20-15-35-35-35z"/></svg>`
   },
+  {
+    nodeId: 'net',
+    name: 'PostgreSQL',
+    category: 'backend',
+    level: 88,
+    tag: 'RELATIONAL DATABASE',
+    color: '#336791',
+    svg: `<svg viewBox="0 0 100 100" width="28" height="28"><path fill="#336791" d="M50 10C27.9 10 10 27.9 10 50s17.9 40 40 40 40-17.9 40-40S72.1 10 50 10zm-5 15c15 0 25 10 25 25s-10 25-25 25H30V25h15zm0 10H38v30h7c9 0 15-6 15-15s-6-15-15-15z"/></svg>`
+  },
+  {
+    nodeId: 'laravel',
+    name: 'MariaDB',
+    category: 'backend',
+    level: 88,
+    tag: 'RELATIONAL DATABASE',
+    color: '#c0765a',
+    svg: `<svg viewBox="0 0 100 100" width="28" height="28"><path fill="#c0765a" d="M50 15C30 15 15 30 15 50s15 35 35 35 35-15 35-35-15-35-35-35zm0 12c12.7 0 23 10.3 23 23S62.7 73 50 73 27 62.7 27 50s10.3-23 23-23z"/></svg>`
+  },
 
   // DevOps & Cloud
   {
@@ -154,5 +173,25 @@ export const skillsData = [
     tag: 'PERFORMANCE TESTING',
     color: '#7D64FF',
     svg: `<svg viewBox="0 0 100 100" width="28" height="28"><path fill="#7D64FF" d="M20 20h20v60H20zm25 0l35 30-35 30V20z"/></svg>`
+  },
+
+  // AI & Automation
+  {
+    nodeId: 'devops',
+    name: 'n8n Workflow Automation',
+    category: 'ai',
+    level: 90,
+    tag: 'AI WORKFLOW AUTOMATION',
+    color: '#FF6D5A',
+    svg: `<svg viewBox="0 0 100 100" width="28" height="28"><path fill="#FF6D5A" d="M20 30h20v40H20zm25-10h20v60H45zm25 20h20v20H70z"/><circle cx="30" cy="50" r="5" fill="#fff"/><circle cx="55" cy="50" r="5" fill="#fff"/><circle cx="80" cy="50" r="5" fill="#fff"/></svg>`
+  },
+  {
+    nodeId: 'devops',
+    name: 'LLM & AI Agent Integration',
+    category: 'ai',
+    level: 88,
+    tag: 'AI AGENTS & LLMS',
+    color: '#10a37f',
+    svg: `<svg viewBox="0 0 100 100" width="28" height="28"><circle cx="50" cy="50" r="35" fill="none" stroke="#10a37f" stroke-width="6"/><circle cx="50" cy="50" r="15" fill="#10a37f"/><path stroke="#10a37f" stroke-width="6" d="M50 5v10M50 85v10M5 50h10M85 50h10"/></svg>`
   }
 ]
