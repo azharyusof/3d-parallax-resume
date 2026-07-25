@@ -118,8 +118,9 @@ let cardStates = []      // { targetX, targetY, targetZ, targetRotY, targetScale
 
 // Drag state
 let dragStartX = 0
+let dragStartY = 0
 let isDragging = false
-const DRAG_THRESHOLD = 60
+const DRAG_THRESHOLD = 25
 
 // ─────────────────────────────────────────────
 // Sizing
@@ -133,7 +134,7 @@ const getSize = () => {
   const w = Math.floor(r.width) || 800
   const isSmall = window.innerWidth <= 480
   const isMobile = window.innerWidth <= 768
-  const h = isSmall ? 190 : (isMobile ? 240 : 320)
+  const h = isSmall ? 250 : (isMobile ? 290 : 320)
   return { w, h }
 }
 
@@ -383,7 +384,9 @@ const initScene = () => {
   scene.fog = new THREE.FogExp2('#08090f', 0.065)
 
   camera = new THREE.PerspectiveCamera(42, cw / ch, 0.1, 60)
-  camera.position.set(0, 0, 6.0)
+  const isSmall = window.innerWidth <= 480
+  const isMobile = window.innerWidth <= 768
+  camera.position.set(0, 0, isSmall ? 4.1 : (isMobile ? 4.6 : 6.0))
 
   renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,
@@ -803,20 +806,41 @@ const onKeyDown = (e) => {
 
 const onPointerDown = (e) => {
   isDragging = true
-  dragStartX = e.clientX ?? e.touches?.[0]?.clientX ?? 0
+  const touch = e.touches ? e.touches[0] : e
+  dragStartX = touch.clientX
+  dragStartY = touch.clientY
 }
 
 const onPointerMove = (e) => {
   if (!isDragging) return
-  const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0
-  const delta = x - dragStartX
-  if (Math.abs(delta) > DRAG_THRESHOLD) {
+  const touch = e.touches ? e.touches[0] : e
+  const currentX = touch.clientX
+  const currentY = touch.clientY
+  const deltaX = currentX - dragStartX
+  const deltaY = currentY - dragStartY
+
+  // Lock horizontal touch swipe on mobile for smooth card sliding
+  if (e.touches && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 8) {
+    if (e.cancelable) e.preventDefault()
+  }
+
+  if (Math.abs(deltaX) > DRAG_THRESHOLD) {
     isDragging = false
-    navigate(delta < 0 ? 1 : -1)
+    navigate(deltaX < 0 ? 1 : -1)
   }
 }
 
-const onPointerUp = () => { isDragging = false }
+const onPointerUp = (e) => {
+  if (!isDragging) return
+  isDragging = false
+  if (e && e.changedTouches && e.changedTouches.length > 0) {
+    const endX = e.changedTouches[0].clientX
+    const deltaX = endX - dragStartX
+    if (Math.abs(deltaX) > DRAG_THRESHOLD) {
+      navigate(deltaX < 0 ? 1 : -1)
+    }
+  }
+}
 
 // ─────────────────────────────────────────────
 // Handle card click (pointer up on canvas)
@@ -953,6 +977,9 @@ const handleResize = () => {
   cw = w; ch = h
   renderer.setSize(cw, ch)
   camera.aspect = cw / ch
+  const isSmall = window.innerWidth <= 480
+  const isMobile = window.innerWidth <= 768
+  camera.position.z = isSmall ? 4.1 : (isMobile ? 4.6 : 6.0)
   camera.updateProjectionMatrix()
 }
 
@@ -993,13 +1020,13 @@ onMounted(() => {
   canvasRef.value?.addEventListener('click', onCanvasClick)
 
   if (wrapperRef.value) {
-    wrapperRef.value.addEventListener('pointerdown',  onPointerDown)
-    wrapperRef.value.addEventListener('pointermove',  onPointerMove)
-    wrapperRef.value.addEventListener('pointerup',    onPointerUp)
-    wrapperRef.value.addEventListener('pointercancel', onPointerUp)
-    wrapperRef.value.addEventListener('touchstart',   onPointerDown, { passive: true })
-    wrapperRef.value.addEventListener('touchmove',    onPointerMove, { passive: true })
-    wrapperRef.value.addEventListener('touchend',     onPointerUp)
+    wrapperRef.value.addEventListener('pointerdown',   onPointerDown)
+    wrapperRef.value.addEventListener('pointermove',   onPointerMove)
+    wrapperRef.value.addEventListener('pointerup',     onPointerUp)
+    wrapperRef.value.addEventListener('pointercancel',  onPointerUp)
+    wrapperRef.value.addEventListener('touchstart',    onPointerDown, { passive: true })
+    wrapperRef.value.addEventListener('touchmove',     onPointerMove, { passive: false })
+    wrapperRef.value.addEventListener('touchend',      onPointerUp)
   }
 
   resizeObserver = new ResizeObserver(handleResize)
@@ -1070,13 +1097,25 @@ onBeforeUnmount(() => {
 
 @media (max-width: 768px) {
   .cert3d-canvas {
-    height: 240px;
+    height: 290px;
+  }
+  .cert3d-arrow--left  { left: 2px; }
+  .cert3d-arrow--right { right: 2px; }
+  .cert3d-info-panel {
+    padding: 10px 14px;
+    margin-top: 4px;
+    max-width: 95%;
   }
 }
 
 @media (max-width: 480px) {
   .cert3d-canvas {
-    height: 190px;
+    height: 250px;
+  }
+  .cert3d-info-panel {
+    padding: 8px 12px;
+    margin-top: 2px;
+    max-width: 98%;
   }
 }
 

@@ -3048,6 +3048,27 @@ onBeforeUnmount(() => {
   .hud-header {
     display: none !important;
   }
+  .about-section {
+    padding-top: 15px !important;
+    padding-bottom: 10px !important;
+    padding-left: 3% !important;
+    padding-right: 3% !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+  .about-section .section-header {
+    margin-bottom: 4px !important;
+    margin-top: 0 !important;
+    text-align: center;
+  }
+  .about-section .section-title {
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  }
   .hero-section {
     padding: 12px 14px !important;
     height: 100vh;
