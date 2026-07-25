@@ -3520,6 +3520,9 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 768px) {
+  .slider-arrow-btn {
+    display: none !important;
+  }
   .experience-section {
     padding: 16px 14px !important;
     height: 100vh;

@@ -1093,6 +1093,9 @@ onBeforeUnmount(() => {
   .cert3d-canvas {
     height: 290px;
   }
+  .cert3d-arrow {
+    display: none !important;
+  }
 }
 
 @media (max-width: 480px) {
