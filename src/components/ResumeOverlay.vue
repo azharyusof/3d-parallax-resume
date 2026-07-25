@@ -449,8 +449,34 @@
         <h2 class="section-title">Get In Touch</h2>
       </div>
 
-      <div class="contact-grid">
-        <div class="glass-panel contact-details-panel">
+      <!-- Mobile Contact Tab Switcher -->
+      <div class="contact-tab-switcher">
+        <button 
+          class="contact-tab-btn" 
+          :class="{ active: activeContactTab === 0 }"
+          @click="activeContactTab = 0; playClick()"
+        >
+          CONTACT INFO
+        </button>
+        <button 
+          class="contact-tab-btn" 
+          :class="{ active: activeContactTab === 1 }"
+          @click="activeContactTab = 1; playClick()"
+        >
+          VIRTUAL QR CARD
+        </button>
+      </div>
+
+      <div 
+        class="contact-grid"
+        @touchstart="onContactTouchStart"
+        @touchmove="onContactTouchMove"
+        @touchend="onContactTouchEnd"
+      >
+        <div 
+          class="glass-panel contact-details-panel"
+          :class="{ 'mobile-hidden': activeContactTab !== 0 }"
+        >
           <div class="panel-tag">// MY_CONTACT_DETAILS</div>
           <p class="contact-lead">
             {{ contactData.leadText }}
@@ -509,7 +535,11 @@
         </div>
 
         <!-- Integrated Contact QR & vCard Card -->
-        <div class="glass-panel contact-qr-card" @mouseenter="triggerHoverSound">
+        <div 
+          class="glass-panel contact-qr-card" 
+          :class="{ 'mobile-hidden': activeContactTab !== 1 }"
+          @mouseenter="triggerHoverSound"
+        >
           <div class="qr-header">
             <QrCode class="qr-icon" />
             <h3 class="panel-title">VIRTUAL CODE CARD</h3>
@@ -885,6 +915,43 @@ const onExpTouchMove = (e) => {
 
 const onExpTouchEnd = () => {
   expIsSwiping = false
+}
+
+// Mobile Contact Section Touch & Tab Slider State
+const activeContactTab = ref(0)
+let contactTouchStartX = 0
+let contactTouchStartY = 0
+let contactIsSwiping = false
+
+const onContactTouchStart = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    contactIsSwiping = true
+    contactTouchStartX = e.touches[0].clientX
+    contactTouchStartY = e.touches[0].clientY
+  }
+}
+
+const onContactTouchMove = (e) => {
+  if (!contactIsSwiping || !e.touches || e.touches.length === 0) return
+  const currentX = e.touches[0].clientX
+  const currentY = e.touches[0].clientY
+  const deltaX = currentX - contactTouchStartX
+  const deltaY = currentY - contactTouchStartY
+
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+    contactIsSwiping = false
+    if (deltaX < 0 && activeContactTab.value === 0) {
+      activeContactTab.value = 1
+      playClick()
+    } else if (deltaX > 0 && activeContactTab.value === 1) {
+      activeContactTab.value = 0
+      playClick()
+    }
+  }
+}
+
+const onContactTouchEnd = () => {
+  contactIsSwiping = false
 }
 
 const scrollToJob = (idx) => {
@@ -3335,6 +3402,111 @@ onBeforeUnmount(() => {
     font-size: 0.78rem;
     line-height: 1.4;
     padding-left: 12px;
+  }
+}
+
+/* Mobile Contact Switcher Bar */
+.contact-tab-switcher {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .contact-tab-switcher {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px;
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .contact-tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+
+  .contact-tab-btn.active {
+    background: linear-gradient(135deg, var(--accent-indigo), var(--accent-cyan));
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+  }
+
+  .glass-panel.contact-details-panel.mobile-hidden,
+  .glass-panel.contact-qr-card.mobile-hidden {
+    display: none !important;
+  }
+
+  .contact-section {
+    padding: 16px 14px !important;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .contact-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contact-details-panel, .contact-qr-card {
+    width: 100%;
+    padding: 16px 14px;
+  }
+
+  .contact-lead, .qr-description {
+    font-size: 0.78rem;
+    margin-bottom: 12px;
+  }
+
+  .comms-cards-list {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .info-card {
+    padding: 10px 12px;
+  }
+
+  .info-icon-box {
+    width: 32px;
+    height: 32px;
+  }
+
+  .info-label {
+    font-size: 0.6rem;
+  }
+
+  .info-value {
+    font-size: 0.76rem;
+  }
+
+  .qr-image {
+    width: 110px;
+    height: 110px;
+  }
+
+  .qr-display-container {
+    margin: 10px 0 14px 0;
   }
 }
 
