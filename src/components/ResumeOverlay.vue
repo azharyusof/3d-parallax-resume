@@ -151,10 +151,10 @@
 
       <div class="glass-panel skills-panel">
         <div class="skills-top-bar">
-          <div class="panel-tag"></div>
+          <div class="panel-tag">// TECH_STACK</div>
           
-          <!-- Category Filter Tabs -->
-          <div class="skills-filter-tabs">
+          <!-- Category Filter Tabs for Desktop -->
+          <div class="skills-filter-tabs d-desktop-only">
             <button 
               v-for="cat in skillCategories" 
               :key="cat.id"
@@ -166,14 +166,29 @@
               {{ cat.name }}
             </button>
           </div>
+
+          <!-- Category Select Dropdown for Mobile -->
+          <div class="skills-mobile-select-wrapper">
+            <select 
+              v-model="activeSkillCategory" 
+              class="skills-mobile-select"
+              @change="triggerClickSound"
+            >
+              <option v-for="cat in skillCategories" :key="cat.id" :value="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+            <ChevronDown class="select-arrow-icon" />
+          </div>
         </div>
 
-        <!-- <p class="skills-info-text">
-          Hover over any technology card below to align WebGL Quantum Core background nodes.
-        </p> -->
-
         <!-- Interactive Skills Brand Slider Track -->
-        <div class="skills-slider-container">
+        <div 
+          class="skills-slider-container"
+          @touchstart="onSkillTouchStart"
+          @touchmove="onSkillTouchMove"
+          @touchend="onSkillTouchEnd"
+        >
           <button 
             class="skills-arrow-btn prev"
             @click="scrollSkills(-1)"
@@ -606,7 +621,8 @@ import {
   MessageSquare,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ChevronDown
 } from '@lucide/vue'
 
 // Import assets & data
@@ -952,6 +968,44 @@ const onContactTouchMove = (e) => {
 
 const onContactTouchEnd = () => {
   contactIsSwiping = false
+}
+
+// Mobile Skills Category Touch Swipe State
+let skillTouchStartX = 0
+let skillTouchStartY = 0
+let skillIsSwiping = false
+
+const onSkillTouchStart = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    skillIsSwiping = true
+    skillTouchStartX = e.touches[0].clientX
+    skillTouchStartY = e.touches[0].clientY
+  }
+}
+
+const onSkillTouchMove = (e) => {
+  if (!skillIsSwiping || !e.touches || e.touches.length === 0) return
+  const currentX = e.touches[0].clientX
+  const currentY = e.touches[0].clientY
+  const deltaX = currentX - skillTouchStartX
+  const deltaY = currentY - skillTouchStartY
+
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+    skillIsSwiping = false
+    const cats = skillCategories
+    const currentIdx = cats.findIndex(c => c.id === activeSkillCategory.value)
+    if (deltaX < 0 && currentIdx < cats.length - 1) {
+      activeSkillCategory.value = cats[currentIdx + 1].id
+      playClick()
+    } else if (deltaX > 0 && currentIdx > 0) {
+      activeSkillCategory.value = cats[currentIdx - 1].id
+      playClick()
+    }
+  }
+}
+
+const onSkillTouchEnd = () => {
+  skillIsSwiping = false
 }
 
 const scrollToJob = (idx) => {
@@ -3405,12 +3459,115 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Mobile Contact Switcher Bar */
-.contact-tab-switcher {
+/* Mobile Category Select Dropdown */
+.skills-mobile-select-wrapper {
   display: none;
 }
 
 @media (max-width: 768px) {
+  .skills-filter-tabs.d-desktop-only {
+    display: none !important;
+  }
+
+  .skills-mobile-select-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .skills-mobile-select {
+    width: 100%;
+    background: rgba(8, 12, 22, 0.85);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    color: var(--accent-cyan);
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 8px 32px 8px 12px;
+    border-radius: 8px;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+  }
+
+  .skills-mobile-select option {
+    background: #080d1a;
+    color: #ffffff;
+  }
+
+  .select-arrow-icon {
+    position: absolute;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    color: var(--accent-cyan);
+    pointer-events: none;
+  }
+
+  .skills-section {
+    padding: 16px 14px !important;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .skills-panel {
+    padding: 14px 12px;
+    max-height: calc(100vh - 65px);
+    max-height: calc(100dvh - 65px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .skills-slider-track {
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .skills-brand-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .skill-brand-card {
+    min-height: 44px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .skill-brand-icon-wrapper {
+    width: 26px;
+    height: 26px;
+  }
+
+  .skill-brand-name {
+    font-size: 0.72rem;
+  }
+
+  .skill-level-num {
+    font-size: 0.65rem;
+  }
+
+  .skill-tag-pill {
+    font-size: 0.52rem;
+    padding: 0 4px;
+  }
+
+  .skills-arrow-btn {
+    display: none !important;
+  }
+
   .contact-tab-switcher {
     display: flex;
     gap: 8px;
