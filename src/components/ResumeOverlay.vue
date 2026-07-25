@@ -164,33 +164,27 @@
           </button>
         </div>
 
-        <!-- Snap-scroll ring cards -->
+        <!-- Snap-scroll ring cards — native CSS snap for smooth swipe -->
         <div
           class="ring-cards-viewport"
           ref="ringViewportRef"
-          @touchstart="onRingTouchStart"
-          @touchmove="onRingTouchMove"
-          @touchend="onRingTouchEnd"
           @scroll.passive="onRingScroll"
         >
           <div
             v-for="(s, idx) in filteredSkills"
-            :key="s.name"
+            :key="s.name + idx"
             class="ring-card"
             :style="{ '--brand-color': s.color }"
           >
             <!-- SVG Radial Progress Ring -->
             <div class="ring-svg-wrapper">
               <svg class="ring-svg" viewBox="0 0 110 110">
-                <!-- Background track -->
                 <circle
-                  class="ring-track"
                   cx="55" cy="55" r="46"
                   fill="none"
                   stroke="rgba(255,255,255,0.07)"
                   stroke-width="7"
                 />
-                <!-- Glowing progress arc -->
                 <circle
                   class="ring-arc"
                   cx="55" cy="55" r="46"
@@ -201,9 +195,8 @@
                   :stroke-dasharray="ringDashArray"
                   :stroke-dashoffset="ringOffset(s.level)"
                   transform="rotate(-90 55 55)"
-                  :style="{ filter: `drop-shadow(0 0 6px ${s.color})` }"
+                  :style="{ filter: `drop-shadow(0 0 8px ${s.color})` }"
                 />
-                <!-- Percentage label -->
                 <text
                   x="55" y="43"
                   text-anchor="middle"
@@ -211,14 +204,12 @@
                   class="ring-pct-text"
                   :fill="s.color"
                 >{{ s.level }}%</text>
-                <!-- Brand Icon (foreign object) -->
                 <foreignObject x="35" y="50" width="40" height="28">
                   <div class="ring-icon-inner" v-html="s.svg"></div>
                 </foreignObject>
               </svg>
             </div>
 
-            <!-- Card info -->
             <div class="ring-card-info">
               <span class="ring-skill-name">{{ s.name }}</span>
               <span class="ring-skill-tag" :style="{ color: s.color, borderColor: s.color }">{{ s.tag }}</span>
@@ -239,85 +230,61 @@
         </div>
       </div>
 
-      <!-- ═══ DESKTOP GLASS PANEL (only desktop) ════════════════════════ -->
-      <div class="glass-panel skills-panel skills-desktop-only">
-        <div class="skills-top-bar">
-          <div class="panel-tag">// TECH_STACK</div>
-          
-          <!-- Sleek Category Filter Tabs (Single-row scrollable on mobile) -->
-          <div class="skills-filter-tabs">
-            <button 
-              v-for="cat in skillCategories" 
-              :key="cat.id"
-              class="skills-tab-btn"
-              :class="{ active: activeSkillCategory === cat.id }"
-              @click="activeSkillCategory = cat.id; triggerClickSound()"
-              @mouseenter="triggerHoverSound"
-            >
-              {{ cat.name }}
-            </button>
-          </div>
+      <!-- ═══ DESKTOP TECH RADAR DASHBOARD (only desktop) ═══════════════ -->
+      <div class="skills-desktop-only skills-radar">
+        <!-- Left: Vertical Category Sidebar -->
+        <div class="skills-sidebar">
+          <div class="sidebar-header">TECH STACK</div>
+          <button
+            v-for="cat in skillCategories"
+            :key="cat.id"
+            class="sidebar-cat-btn"
+            :class="{ active: activeSkillCategory === cat.id }"
+            @click="activeSkillCategory = cat.id; triggerClickSound()"
+            @mouseenter="triggerHoverSound"
+          >
+            <span class="sidebar-dot"></span>
+            <span class="sidebar-label">{{ cat.name }}</span>
+            <span class="sidebar-count">{{ cat.id === 'all' ? allSkills.length : allSkills.filter(s => s.category === cat.id).length }}</span>
+          </button>
         </div>
 
-        <!-- Interactive Skills Brand Slider Track -->
-        <div class="skills-slider-container">
-          <button 
-            class="skills-arrow-btn prev"
-            @click="scrollSkills(-1)"
-            :disabled="isSkillsAtStart"
-            @mouseenter="triggerHoverSound"
-            aria-label="Previous skills"
-          >
-            <ChevronLeft class="arrow-icon" />
-          </button>
+        <!-- Right: Glass Card Grid -->
+        <div class="skills-grid-area">
+          <TransitionGroup name="skill-grid" tag="div" class="skills-radar-grid">
+            <div
+              v-for="s in filteredSkills"
+              :key="s.name"
+              :ref="addSkillCard"
+              class="radar-skill-card"
+              :class="{ active: hoveredSkillName === s.name }"
+              :style="{ '--brand-color': s.color }"
+              @mouseenter="onSkillHover(s)"
+              @mouseleave="onSkillLeave"
+              @click="onSkillSelect(s)"
+            >
+              <!-- Icon area with glow -->
+              <div class="radar-icon-zone">
+                <div class="radar-glow" :style="{ background: s.color }"></div>
+                <div class="radar-icon-box" v-html="s.svg"></div>
+              </div>
 
-          <div ref="skillsTrackRef" class="skills-slider-track" @scroll="checkSkillsScroll">
-            <div class="skills-brand-grid">
-              <div 
-                v-for="s in filteredSkills" 
-                :key="s.name"
-                :ref="addSkillCard"
-                class="skill-brand-card"
-                :class="{ active: hoveredSkillName === s.name }"
-                :style="{ '--brand-color': s.color }"
-                @mouseenter="onSkillHover(s)"
-                @mouseleave="onSkillLeave"
-                @click="onSkillSelect(s)"
-              >
-                <div class="skill-brand-icon-wrapper">
-                  <div class="brand-glow" :style="{ backgroundColor: s.color }"></div>
-                  <div class="brand-svg-box" v-html="s.svg"></div>
+              <!-- Info -->
+              <div class="radar-info">
+                <div class="radar-name-row">
+                  <span class="radar-skill-name">{{ s.name }}</span>
+                  <span class="radar-pct" :style="{ color: s.color }">{{ s.level }}%</span>
                 </div>
-                
-                <div class="skill-brand-info">
-                  <div class="skill-brand-header">
-                    <span class="skill-brand-name">{{ s.name }}</span>
-                    <span class="skill-level-num" :style="{ color: s.color }">{{ s.level }}%</span>
-                  </div>
-
-                  <!-- Animated level progress bar -->
-                  <div class="skill-progress-track">
-                    <div 
-                      class="skill-progress-fill" 
-                      :style="{ width: s.level + '%', backgroundColor: s.color, boxShadow: `0 0 10px ${s.color}` }"
-                    ></div>
-                  </div>
-
-                  <span class="skill-tag-pill" :style="{ borderColor: s.color, color: s.color }">{{ s.tag }}</span>
+                <div class="radar-bar-track">
+                  <div
+                    class="radar-bar-fill"
+                    :style="{ width: s.level + '%', background: `linear-gradient(90deg, ${s.color}88, ${s.color})`, boxShadow: `0 0 8px ${s.color}66` }"
+                  ></div>
                 </div>
+                <span class="radar-tag" :style="{ color: s.color, borderColor: s.color + '55' }">{{ s.tag }}</span>
               </div>
             </div>
-          </div>
-
-          <button 
-            class="skills-arrow-btn next"
-            @click="scrollSkills(1)"
-            :disabled="isSkillsAtEnd"
-            @mouseenter="triggerHoverSound"
-            aria-label="Next skills"
-          >
-            <ChevronRight class="arrow-icon" />
-          </button>
+          </TransitionGroup>
         </div>
       </div>
     </section>
@@ -3597,6 +3564,292 @@ onBeforeUnmount(() => {
 /* ── Skills section mobile ring carousel ──────────────────────── */
 .skills-ring-carousel {
   display: none;
+}
+
+/* ── Desktop Tech Radar Dashboard ──────────────────────────────── */
+.skills-radar {
+  display: flex;
+  width: 100%;
+  gap: 0;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.skills-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 16px;
+  background: rgba(8, 10, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px 0 0 16px;
+  backdrop-filter: blur(20px);
+}
+
+.sidebar-header {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: var(--accent-indigo);
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+.sidebar-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 9px 12px;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  width: 100%;
+  border: 1px solid transparent;
+}
+
+.sidebar-cat-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-cat-btn.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(6, 182, 212, 0.12));
+  border-color: rgba(6, 182, 212, 0.3);
+  box-shadow: inset 0 0 12px rgba(6, 182, 212, 0.06);
+}
+
+.sidebar-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.sidebar-cat-btn.active .sidebar-dot {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.sidebar-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex: 1;
+  transition: color 0.3s ease;
+  letter-spacing: 0.02em;
+}
+
+.sidebar-cat-btn.active .sidebar-label,
+.sidebar-cat-btn:hover .sidebar-label {
+  color: var(--text-main);
+}
+
+.sidebar-count {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 8px;
+  min-width: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.sidebar-cat-btn.active .sidebar-count {
+  background: rgba(6, 182, 212, 0.2);
+  color: var(--accent-cyan);
+}
+
+.skills-grid-area {
+  flex: 1;
+  background: rgba(8, 10, 20, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: none;
+  border-radius: 0 16px 16px 0;
+  backdrop-filter: blur(20px);
+  overflow-y: auto;
+  padding: 18px 16px;
+}
+
+.skills-grid-area::-webkit-scrollbar {
+  width: 4px;
+}
+.skills-grid-area::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+}
+.skills-grid-area::-webkit-scrollbar-thumb {
+  background: rgba(6,182,212,0.3);
+  border-radius: 2px;
+}
+
+.skills-radar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.radar-skill-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  background: rgba(13, 17, 28, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.radar-skill-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--brand-color, transparent) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.radar-skill-card:hover::before,
+.radar-skill-card.active::before {
+  opacity: 0.07;
+}
+
+.radar-skill-card:hover,
+.radar-skill-card.active {
+  border-color: var(--brand-color, var(--accent-cyan));
+  box-shadow: 0 0 16px rgba(0,0,0,0.3), 0 0 0 1px var(--brand-color, var(--accent-cyan))22;
+  transform: translateY(-2px);
+}
+
+.radar-icon-zone {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  opacity: 0.12;
+  transition: opacity 0.3s ease;
+  filter: blur(4px);
+}
+
+.radar-skill-card:hover .radar-glow,
+.radar-skill-card.active .radar-glow {
+  opacity: 0.25;
+}
+
+.radar-icon-box {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar-icon-box svg {
+  width: 26px;
+  height: 26px;
+}
+
+.radar-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.radar-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.radar-skill-name {
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.radar-pct {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.radar-bar-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.radar-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.radar-tag {
+  font-family: var(--font-display);
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid;
+  background: rgba(0, 0, 0, 0.25);
+  align-self: flex-start;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ── TransitionGroup animations for category switch ── */
+.skill-grid-enter-active {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.skill-grid-leave-active {
+  transition: all 0.2s ease;
+  position: absolute;
+}
+.skill-grid-enter-from {
+  opacity: 0;
+  transform: translateY(12px) scale(0.95);
+}
+.skill-grid-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
 }
 
 .skills-desktop-only {
