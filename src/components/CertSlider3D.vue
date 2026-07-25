@@ -118,9 +118,8 @@ let cardStates = []      // { targetX, targetY, targetZ, targetRotY, targetScale
 
 // Drag state
 let dragStartX = 0
-let dragStartY = 0
 let isDragging = false
-const DRAG_THRESHOLD = 25
+const DRAG_THRESHOLD = 60
 
 // ─────────────────────────────────────────────
 // Sizing
@@ -134,7 +133,7 @@ const getSize = () => {
   const w = Math.floor(r.width) || 800
   const isSmall = window.innerWidth <= 480
   const isMobile = window.innerWidth <= 768
-  const h = isSmall ? 250 : (isMobile ? 290 : 320)
+  const h = isSmall ? 260 : (isMobile ? 290 : 320)
   return { w, h }
 }
 
@@ -384,9 +383,7 @@ const initScene = () => {
   scene.fog = new THREE.FogExp2('#08090f', 0.065)
 
   camera = new THREE.PerspectiveCamera(42, cw / ch, 0.1, 60)
-  const isSmall = window.innerWidth <= 480
-  const isMobile = window.innerWidth <= 768
-  camera.position.set(0, 0, isSmall ? 4.1 : (isMobile ? 4.6 : 6.0))
+  camera.position.set(0, 0, 6.0)
 
   renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,
@@ -655,13 +652,13 @@ const computeTargetState = (offset) => {
   const isMobile = window.innerWidth <= 768
 
   let targetX, targetZ, targetRotY, targetScale, targetOpacity
-  const spacing = isSmall ? 1.5 : (isMobile ? 1.9 : 2.6)
+  const spacing = isSmall ? 1.4 : (isMobile ? 1.7 : 2.6)
 
   targetX     = offset * spacing
-  targetRotY  = -offset * 0.62      // ≈ 35.5°
-  targetZ     = abs === 0 ? 0.80 : (abs === 1 ? -1.2 : -2.8)
-  targetScale = abs === 0 ? (isSmall ? 0.95 : 1.45) : (abs === 1 ? (isSmall ? 0.50 : 0.60) : (abs === 2 ? 0.38 : 0.36))
-  targetOpacity = abs === 0 ? 1.0 : (abs === 1 ? 0.55 : (abs === 2 ? 0.18 : 0.0))
+  targetRotY  = -offset * 0.52
+  targetZ     = abs === 0 ? 1.10 : (abs === 1 ? -1.0 : -2.5)
+  targetScale = abs === 0 ? (isSmall ? 1.30 : (isMobile ? 1.40 : 1.45)) : (abs === 1 ? (isSmall ? 0.65 : 0.70) : (abs === 2 ? 0.38 : 0.36))
+  targetOpacity = abs === 0 ? 1.0 : (abs === 1 ? 0.60 : (abs === 2 ? 0.20 : 0.0))
 
   return { targetX, targetY: 0, targetZ, targetRotY, targetScale, targetOpacity }
 }
@@ -804,43 +801,43 @@ const onKeyDown = (e) => {
   if (e.key === 'ArrowRight') navigate(1)
 }
 
+let touchStartX = 0
+let touchStartY = 0
+
 const onPointerDown = (e) => {
   isDragging = true
-  const touch = e.touches ? e.touches[0] : e
-  dragStartX = touch.clientX
-  dragStartY = touch.clientY
+  if (e.touches && e.touches.length > 0) {
+    touchStartX = e.touches[0].clientX
+    touchStartY = e.touches[0].clientY
+  } else {
+    dragStartX = e.clientX ?? 0
+  }
 }
 
 const onPointerMove = (e) => {
   if (!isDragging) return
-  const touch = e.touches ? e.touches[0] : e
-  const currentX = touch.clientX
-  const currentY = touch.clientY
-  const deltaX = currentX - dragStartX
-  const deltaY = currentY - dragStartY
 
-  // Lock horizontal touch swipe on mobile for smooth card sliding
-  if (e.touches && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 8) {
-    if (e.cancelable) e.preventDefault()
-  }
+  if (e.touches && e.touches.length > 0) {
+    const currentX = e.touches[0].clientX
+    const currentY = e.touches[0].clientY
+    const deltaX = currentX - touchStartX
+    const deltaY = currentY - touchStartY
 
-  if (Math.abs(deltaX) > DRAG_THRESHOLD) {
-    isDragging = false
-    navigate(deltaX < 0 ? 1 : -1)
-  }
-}
-
-const onPointerUp = (e) => {
-  if (!isDragging) return
-  isDragging = false
-  if (e && e.changedTouches && e.changedTouches.length > 0) {
-    const endX = e.changedTouches[0].clientX
-    const deltaX = endX - dragStartX
-    if (Math.abs(deltaX) > DRAG_THRESHOLD) {
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 25) {
+      isDragging = false
       navigate(deltaX < 0 ? 1 : -1)
+    }
+  } else {
+    const x = e.clientX ?? 0
+    const delta = x - dragStartX
+    if (Math.abs(delta) > 30) {
+      isDragging = false
+      navigate(delta < 0 ? 1 : -1)
     }
   }
 }
+
+const onPointerUp = () => { isDragging = false }
 
 // ─────────────────────────────────────────────
 // Handle card click (pointer up on canvas)
@@ -977,9 +974,6 @@ const handleResize = () => {
   cw = w; ch = h
   renderer.setSize(cw, ch)
   camera.aspect = cw / ch
-  const isSmall = window.innerWidth <= 480
-  const isMobile = window.innerWidth <= 768
-  camera.position.z = isSmall ? 4.1 : (isMobile ? 4.6 : 6.0)
   camera.updateProjectionMatrix()
 }
 
@@ -1020,13 +1014,13 @@ onMounted(() => {
   canvasRef.value?.addEventListener('click', onCanvasClick)
 
   if (wrapperRef.value) {
-    wrapperRef.value.addEventListener('pointerdown',   onPointerDown)
-    wrapperRef.value.addEventListener('pointermove',   onPointerMove)
-    wrapperRef.value.addEventListener('pointerup',     onPointerUp)
-    wrapperRef.value.addEventListener('pointercancel',  onPointerUp)
-    wrapperRef.value.addEventListener('touchstart',    onPointerDown, { passive: true })
-    wrapperRef.value.addEventListener('touchmove',     onPointerMove, { passive: false })
-    wrapperRef.value.addEventListener('touchend',      onPointerUp)
+    wrapperRef.value.addEventListener('pointerdown',  onPointerDown)
+    wrapperRef.value.addEventListener('pointermove',  onPointerMove)
+    wrapperRef.value.addEventListener('pointerup',    onPointerUp)
+    wrapperRef.value.addEventListener('pointercancel', onPointerUp)
+    wrapperRef.value.addEventListener('touchstart',   onPointerDown, { passive: true })
+    wrapperRef.value.addEventListener('touchmove',    onPointerMove, { passive: true })
+    wrapperRef.value.addEventListener('touchend',     onPointerUp)
   }
 
   resizeObserver = new ResizeObserver(handleResize)
@@ -1099,23 +1093,11 @@ onBeforeUnmount(() => {
   .cert3d-canvas {
     height: 290px;
   }
-  .cert3d-arrow--left  { left: 2px; }
-  .cert3d-arrow--right { right: 2px; }
-  .cert3d-info-panel {
-    padding: 10px 14px;
-    margin-top: 4px;
-    max-width: 95%;
-  }
 }
 
 @media (max-width: 480px) {
   .cert3d-canvas {
-    height: 250px;
-  }
-  .cert3d-info-panel {
-    padding: 8px 12px;
-    margin-top: 2px;
-    max-width: 98%;
+    height: 260px;
   }
 }
 
