@@ -149,7 +149,98 @@
         <h2 class="section-title">TECHNOLOGY & SKILLS</h2>
       </div>
 
-      <div class="glass-panel skills-panel">
+      <!-- ═══ MOBILE RING CAROUSEL (only mobile) ════════════════════════ -->
+      <div class="skills-ring-carousel">
+        <!-- Category chips -->
+        <div class="skills-ring-cats">
+          <button
+            v-for="cat in skillCategories"
+            :key="cat.id"
+            class="ring-cat-chip"
+            :class="{ active: activeSkillCategory === cat.id }"
+            @click="activeSkillCategory = cat.id; ringCarouselIdx = 0; triggerClickSound()"
+          >
+            {{ cat.name }}
+          </button>
+        </div>
+
+        <!-- Snap-scroll ring cards -->
+        <div
+          class="ring-cards-viewport"
+          ref="ringViewportRef"
+          @touchstart="onRingTouchStart"
+          @touchmove="onRingTouchMove"
+          @touchend="onRingTouchEnd"
+          @scroll.passive="onRingScroll"
+        >
+          <div
+            v-for="(s, idx) in filteredSkills"
+            :key="s.name"
+            class="ring-card"
+            :style="{ '--brand-color': s.color }"
+          >
+            <!-- SVG Radial Progress Ring -->
+            <div class="ring-svg-wrapper">
+              <svg class="ring-svg" viewBox="0 0 110 110">
+                <!-- Background track -->
+                <circle
+                  class="ring-track"
+                  cx="55" cy="55" r="46"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.07)"
+                  stroke-width="7"
+                />
+                <!-- Glowing progress arc -->
+                <circle
+                  class="ring-arc"
+                  cx="55" cy="55" r="46"
+                  fill="none"
+                  :stroke="s.color"
+                  stroke-width="7"
+                  stroke-linecap="round"
+                  :stroke-dasharray="ringDashArray"
+                  :stroke-dashoffset="ringOffset(s.level)"
+                  transform="rotate(-90 55 55)"
+                  :style="{ filter: `drop-shadow(0 0 6px ${s.color})` }"
+                />
+                <!-- Percentage label -->
+                <text
+                  x="55" y="43"
+                  text-anchor="middle"
+                  dominant-baseline="middle"
+                  class="ring-pct-text"
+                  :fill="s.color"
+                >{{ s.level }}%</text>
+                <!-- Brand Icon (foreign object) -->
+                <foreignObject x="35" y="50" width="40" height="28">
+                  <div class="ring-icon-inner" v-html="s.svg"></div>
+                </foreignObject>
+              </svg>
+            </div>
+
+            <!-- Card info -->
+            <div class="ring-card-info">
+              <span class="ring-skill-name">{{ s.name }}</span>
+              <span class="ring-skill-tag" :style="{ color: s.color, borderColor: s.color }">{{ s.tag }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dot Pagination -->
+        <div class="ring-dots">
+          <span
+            v-for="(s, idx) in filteredSkills"
+            :key="idx"
+            class="ring-dot"
+            :class="{ active: idx === ringCarouselIdx }"
+            :style="idx === ringCarouselIdx ? { background: filteredSkills[ringCarouselIdx]?.color } : {}"
+            @click="scrollRingTo(idx)"
+          ></span>
+        </div>
+      </div>
+
+      <!-- ═══ DESKTOP GLASS PANEL (only desktop) ════════════════════════ -->
+      <div class="glass-panel skills-panel skills-desktop-only">
         <div class="skills-top-bar">
           <div class="panel-tag">// TECH_STACK</div>
           
@@ -169,12 +260,7 @@
         </div>
 
         <!-- Interactive Skills Brand Slider Track -->
-        <div 
-          class="skills-slider-container"
-          @touchstart="onSkillTouchStart"
-          @touchmove="onSkillTouchMove"
-          @touchend="onSkillTouchEnd"
-        >
+        <div class="skills-slider-container">
           <button 
             class="skills-arrow-btn prev"
             @click="scrollSkills(-1)"
@@ -674,7 +760,7 @@ const activeSkillCategory = ref('all')
 const hoveredSkillName = ref(null)
 const activeFilter = ref('All')
 
-// Skills slider track ref & scroll actions
+// ── Skills slider track (desktop) ─────────────────────────────────────────
 const skillsTrackRef = ref(null)
 const isSkillsAtStart = ref(true)
 const isSkillsAtEnd = ref(false)
@@ -694,7 +780,70 @@ const scrollSkills = (direction) => {
   el.scrollBy({ left: scrollAmount, behavior: 'smooth' })
 }
 
+// ── Skill Ring Carousel (mobile) ──────────────────────────────────────────
+const ringViewportRef = ref(null)
+const ringCarouselIdx = ref(0)
+const ringDashArray = 2 * Math.PI * 46  // circumference for r=46
+
+const ringOffset = (level) => {
+  return ringDashArray * (1 - level / 100)
+}
+
+const scrollRingTo = (idx) => {
+  if (!ringViewportRef.value) return
+  const cards = ringViewportRef.value.querySelectorAll('.ring-card')
+  if (cards[idx]) {
+    cards[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+  }
+  ringCarouselIdx.value = idx
+}
+
+const onRingScroll = () => {
+  if (!ringViewportRef.value) return
+  const vp = ringViewportRef.value
+  const cardWidth = vp.scrollWidth / (filteredSkills.value.length || 1)
+  ringCarouselIdx.value = Math.round(vp.scrollLeft / cardWidth)
+}
+
+let ringTouchStartX = 0
+let ringTouchStartY = 0
+let ringIsSwiping = false
+
+const onRingTouchStart = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    ringIsSwiping = true
+    ringTouchStartX = e.touches[0].clientX
+    ringTouchStartY = e.touches[0].clientY
+  }
+}
+
+const onRingTouchMove = (e) => {
+  if (!ringIsSwiping || !e.touches || e.touches.length === 0) return
+  const dx = e.touches[0].clientX - ringTouchStartX
+  const dy = e.touches[0].clientY - ringTouchStartY
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) {
+    e.preventDefault()
+  }
+}
+
+const onRingTouchEnd = (e) => {
+  if (!ringIsSwiping) return
+  ringIsSwiping = false
+  const dx = e.changedTouches[0].clientX - ringTouchStartX
+  const dy = e.changedTouches[0].clientY - ringTouchStartY
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 35) {
+    const total = filteredSkills.value.length
+    if (dx < 0 && ringCarouselIdx.value < total - 1) {
+      scrollRingTo(ringCarouselIdx.value + 1)
+    } else if (dx > 0 && ringCarouselIdx.value > 0) {
+      scrollRingTo(ringCarouselIdx.value - 1)
+    }
+  }
+}
+
+// Reset ring index when category changes
 watch(activeSkillCategory, () => {
+  ringCarouselIdx.value = 0
   if (skillsTrackRef.value) {
     skillsTrackRef.value.scrollLeft = 0
   }
@@ -3445,6 +3594,203 @@ onBeforeUnmount(() => {
   }
 }
 
+/* ── Skills section mobile ring carousel ──────────────────────── */
+.skills-ring-carousel {
+  display: none;
+}
+
+.skills-desktop-only {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .skills-ring-carousel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .skills-desktop-only {
+    display: none !important;
+  }
+
+  .skills-section {
+    padding: 12px 14px !important;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* ── Category chips ── */
+  .skills-ring-cats {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .skills-ring-cats::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ring-cat-chip {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 0.63rem;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing: 0.04em;
+  }
+
+  .ring-cat-chip.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(6, 182, 212, 0.4));
+    border-color: var(--accent-cyan);
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.35);
+  }
+
+  /* ── Snap scroll viewport ── */
+  .ring-cards-viewport {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 8px 0;
+  }
+
+  .ring-cards-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ── Individual ring card ── */
+  .ring-card {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+  }
+
+  /* ── SVG ring ── */
+  .ring-svg-wrapper {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 18px rgba(0,0,0,0.6));
+  }
+
+  .ring-svg {
+    width: 160px;
+    height: 160px;
+  }
+
+  .ring-arc {
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ring-pct-text {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+  }
+
+  .ring-icon-inner {
+    width: 40px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.9;
+  }
+
+  .ring-icon-inner svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* ── Card info below ring ── */
+  .ring-card-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-align: center;
+  }
+
+  .ring-skill-name {
+    font-family: var(--font-display);
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: 0.04em;
+  }
+
+  .ring-skill-tag {
+    font-family: var(--font-display);
+    font-size: 0.60rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+    background: rgba(0,0,0,0.25);
+  }
+
+  /* ── Dot pagination ── */
+  .ring-dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 90%;
+    margin-top: 2px;
+  }
+
+  .ring-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .ring-dot.active {
+    width: 18px;
+    border-radius: 3px;
+    box-shadow: 0 0 8px currentColor;
+  }
+}
+
 @media (max-width: 768px) {
   .skills-top-bar {
     flex-direction: column;
@@ -3485,19 +3831,6 @@ onBeforeUnmount(() => {
     border-color: var(--accent-cyan);
     color: #ffffff;
     box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
-  }
-
-  .skills-section {
-    padding: 12px 14px !important;
-    height: 100vh;
-    height: 100dvh;
-    max-height: 100vh;
-    max-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    box-sizing: border-box;
-    overflow: hidden;
   }
 
   .skills-panel {
