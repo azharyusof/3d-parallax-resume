@@ -70,7 +70,7 @@
 
             <!-- Diagnostics dashboard -->
             <div class="hero-diagnostics">
-              <div v-for="diag in heroData.diagnostics" :key="diag.label" class="diag-item">
+              <div v-for="diag in liveDiagnostics" :key="diag.label" class="diag-item">
                 <span class="diag-label">{{ diag.label }}</span>
                 <span class="diag-value" :class="{ 'status-online': diag.isOnline }">{{ diag.value }}</span>
               </div>
@@ -536,7 +536,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import CertSlider3D from './CertSlider3D.vue'
 import { useLiquidGlass } from '../utils/useLiquidGlass'
 import { 
@@ -882,6 +882,45 @@ const fullTypingText = heroData.bioTypingText
 const typingText = ref('')
 const terminalCodeRef = ref(null)
 
+// Real-time dynamic metrics (Session Uptime, Frame Execution Load, Network Status)
+const sessionStartTime = Date.now()
+const realUptime = ref('00:00')
+const realSysLoad = ref('0.00ms')
+const isOnlineStatus = ref(navigator.onLine)
+
+let diagInterval = null
+
+const updateRealMetrics = () => {
+  // 1. Live Session Uptime (MM:SS or HH:MM:SS)
+  const elapsedSec = Math.floor((Date.now() - sessionStartTime) / 1000)
+  const hrs = Math.floor(elapsedSec / 3600)
+  const mins = String(Math.floor((elapsedSec % 3600) / 60)).padStart(2, '0')
+  const secs = String(elapsedSec % 60).padStart(2, '0')
+  
+  if (hrs > 0) {
+    realUptime.value = `${String(hrs).padStart(2, '0')}:${mins}:${secs}`
+  } else {
+    realUptime.value = `${mins}:${secs}`
+  }
+
+  // 2. Live JS Frame Execution Latency (SYS_LOAD)
+  const t0 = performance.now()
+  requestAnimationFrame(() => {
+    const t1 = performance.now()
+    const loadMs = (t1 - t0).toFixed(2)
+    realSysLoad.value = `${loadMs}ms`
+  })
+}
+
+const handleOnline = () => { isOnlineStatus.value = true }
+const handleOffline = () => { isOnlineStatus.value = false }
+
+const liveDiagnostics = computed(() => [
+  { label: 'CORE_STATUS', value: isOnlineStatus.value ? 'ONLINE' : 'OFFLINE', isOnline: isOnlineStatus.value },
+  { label: 'UPTIME', value: realUptime.value, isOnline: true },
+  { label: 'SYS_LOAD', value: realSysLoad.value, isOnline: true }
+])
+
 const runTypingEffect = () => {
   let index = 0
   const interval = setInterval(() => {
@@ -1015,6 +1054,16 @@ END:VCARD`
 
 onMounted(() => {
   runTypingEffect()
+  updateRealMetrics()
+  diagInterval = setInterval(updateRealMetrics, 1000)
+  window.addEventListener('online', handleOnline)
+  window.addEventListener('offline', handleOffline)
+})
+
+onBeforeUnmount(() => {
+  if (diagInterval) clearInterval(diagInterval)
+  window.removeEventListener('online', handleOnline)
+  window.removeEventListener('offline', handleOffline)
 })
 </script>
 
