@@ -266,7 +266,12 @@
         </button>
       </div>
 
-      <div class="timeline-console-wrapper">
+      <div 
+        class="timeline-console-wrapper"
+        @touchstart="onExpTouchStart"
+        @touchmove="onExpTouchMove"
+        @touchend="onExpTouchEnd"
+      >
         <Transition :name="transitionDirection" mode="out-in">
           <div 
             :key="activeJobIndex"
@@ -848,6 +853,39 @@ watch(() => props.activeJobIndex, (newVal, oldVal) => {
     transitionDirection.value = 'slide-prev'
   }
 })
+
+let expTouchStartX = 0
+let expTouchStartY = 0
+let expIsSwiping = false
+
+const onExpTouchStart = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    expIsSwiping = true
+    expTouchStartX = e.touches[0].clientX
+    expTouchStartY = e.touches[0].clientY
+  }
+}
+
+const onExpTouchMove = (e) => {
+  if (!expIsSwiping || !e.touches || e.touches.length === 0) return
+  const currentX = e.touches[0].clientX
+  const currentY = e.touches[0].clientY
+  const deltaX = currentX - expTouchStartX
+  const deltaY = currentY - expTouchStartY
+
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+    expIsSwiping = false
+    if (deltaX < 0 && props.activeJobIndex < experiences.length - 1) {
+      scrollToJob(props.activeJobIndex + 1)
+    } else if (deltaX > 0 && props.activeJobIndex > 0) {
+      scrollToJob(props.activeJobIndex - 1)
+    }
+  }
+}
+
+const onExpTouchEnd = () => {
+  expIsSwiping = false
+}
 
 const scrollToJob = (idx) => {
   playClick()
@@ -2315,6 +2353,24 @@ onBeforeUnmount(() => {
   margin-top: 15px;
 }
 
+.job-bullets-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.job-bullets-wrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.job-bullets-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.35);
+  border-radius: 2px;
+}
+
+.job-bullets-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
+}
+
 .job-bullets {
   list-style-type: none;
   padding-left: 0;
@@ -3197,9 +3253,135 @@ onBeforeUnmount(() => {
   }
 }
 
+@media (max-width: 768px) {
+  .experience-section {
+    padding: 16px 14px !important;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .horizontal-nav-timeline {
+    padding: 0 10px;
+    margin: 0 0 18px 0;
+  }
+  .horiz-track-bg, .horiz-track-active {
+    left: 30px;
+    right: 30px;
+    top: 13px;
+  }
+  .horiz-node-btn {
+    width: 90px;
+  }
+  .node-dot-wrapper {
+    width: 28px;
+    height: 28px;
+  }
+  .node-dot {
+    width: 8px;
+    height: 8px;
+  }
+  .node-year {
+    font-size: 0.68rem;
+    margin-top: 6px;
+  }
+  .node-company-short {
+    font-size: 0.58rem;
+    margin-top: 2px;
+  }
+  .timeline-console-wrapper {
+    min-height: auto;
+    width: 100%;
+  }
+  .timeline-card {
+    padding: 14px 14px;
+    border-radius: 12px;
+  }
+  .job-card-header {
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+  }
+  .job-role {
+    font-size: 0.95rem;
+    line-height: 1.25;
+  }
+  .job-company {
+    font-size: 0.82rem;
+  }
+  .system-record-tag {
+    font-size: 0.58rem;
+  }
+  .job-meta-info {
+    font-size: 0.7rem;
+    gap: 2px;
+  }
+  .job-bullets-wrapper {
+    margin-top: 8px;
+    max-height: 190px;
+    overflow-y: auto;
+    padding-right: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .job-bullets {
+    gap: 6px;
+  }
+  .job-bullets li {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    padding-left: 12px;
+  }
+}
+
 @media (max-width: 480px) {
   .hud-header {
     display: none !important;
+  }
+  .horizontal-nav-timeline {
+    padding: 0 4px;
+    margin: 0 0 12px 0;
+  }
+  .horiz-track-bg, .horiz-track-active {
+    left: 20px;
+    right: 20px;
+    top: 11px;
+  }
+  .horiz-node-btn {
+    width: 75px;
+  }
+  .node-dot-wrapper {
+    width: 24px;
+    height: 24px;
+  }
+  .node-dot {
+    width: 6px;
+    height: 6px;
+  }
+  .node-year {
+    font-size: 0.62rem;
+    margin-top: 4px;
+  }
+  .node-company-short {
+    font-size: 0.52rem;
+  }
+  .timeline-card {
+    padding: 12px 10px;
+  }
+  .job-role {
+    font-size: 0.9rem;
+  }
+  .job-bullets-wrapper {
+    max-height: 175px;
+    margin-top: 6px;
+  }
+  .job-bullets li {
+    font-size: 0.74rem;
+    line-height: 1.35;
   }
   .hero-panel {
     padding: 12px 10px;
@@ -3232,15 +3414,6 @@ onBeforeUnmount(() => {
     padding: 6px 8px;
     font-size: 0.7rem;
     min-height: 36px;
-  }
-  .horizontal-nav-timeline {
-    padding: 0 5px;
-  }
-  .horiz-node-btn {
-    width: 70px;
-  }
-  .node-company-short {
-    font-size: 0.55rem;
   }
   .album-slider-perspective {
     height: 410px;
