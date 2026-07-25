@@ -2938,7 +2938,7 @@ onMounted(() => {
     display: none !important;
   }
   .hero-section {
-    padding: 12px 14px !important;
+    padding: 10px 12px !important;
     height: 100vh;
     height: 100dvh;
     max-height: 100vh;
@@ -2956,20 +2956,24 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     width: 100%;
+    height: 100%;
     min-height: 0;
   }
   .hero-panel {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 14px 14px;
-    gap: 10px;
-    min-height: auto;
-    max-height: calc(100vh - 40px);
-    max-height: calc(100dvh - 40px);
+    padding: 18px 16px;
+    gap: 12px;
+    min-height: calc(100vh - 45px);
+    min-height: calc(100dvh - 45px);
+    max-height: calc(100vh - 35px);
+    max-height: calc(100dvh - 35px);
     width: 100%;
     overflow-y: auto;
     box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
   }
   .hero-profile-pane {
     width: 100%;
@@ -3030,16 +3034,16 @@ onMounted(() => {
     margin-bottom: 8px;
   }
   .terminal-text-box {
-    height: 90px;
-    min-height: 90px;
-    max-height: 90px;
-    padding: 10px 12px;
-    margin-bottom: 10px;
+    height: 130px;
+    min-height: 130px;
+    max-height: 130px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
     gap: 8px;
   }
   .terminal-code {
-    font-size: 0.78rem;
-    line-height: 1.4;
+    font-size: 0.8rem;
+    line-height: 1.45;
   }
   .hero-action-row {
     flex-direction: row;
@@ -3108,8 +3112,12 @@ onMounted(() => {
     display: none !important;
   }
   .hero-panel {
-    padding: 10px 10px;
-    gap: 8px;
+    padding: 14px 12px;
+    gap: 10px;
+    min-height: calc(100vh - 40px);
+    min-height: calc(100dvh - 40px);
+    max-height: calc(100vh - 30px);
+    max-height: calc(100dvh - 30px);
   }
   .avatar-wrapper {
     width: 75px;
@@ -3121,11 +3129,15 @@ onMounted(() => {
     height: 100%;
   }
   .terminal-text-box {
-    height: 85px;
-    min-height: 85px;
-    max-height: 85px;
-    padding: 8px 10px;
-    margin-bottom: 8px;
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .terminal-code {
+    font-size: 0.78rem;
+    line-height: 1.4;
   }
   .hero-action-row .action-btn-primary,
   .hero-action-row .action-btn-secondary {
