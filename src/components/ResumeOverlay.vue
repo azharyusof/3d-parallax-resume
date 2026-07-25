@@ -153,8 +153,8 @@
         <div class="skills-top-bar">
           <div class="panel-tag">// TECH_STACK</div>
           
-          <!-- Category Filter Tabs for Desktop -->
-          <div class="skills-filter-tabs d-desktop-only">
+          <!-- Sleek Category Filter Tabs (Single-row scrollable on mobile) -->
+          <div class="skills-filter-tabs">
             <button 
               v-for="cat in skillCategories" 
               :key="cat.id"
@@ -165,20 +165,6 @@
             >
               {{ cat.name }}
             </button>
-          </div>
-
-          <!-- Category Select Dropdown for Mobile -->
-          <div class="skills-mobile-select-wrapper">
-            <select 
-              v-model="activeSkillCategory" 
-              class="skills-mobile-select"
-              @change="triggerClickSound"
-            >
-              <option v-for="cat in skillCategories" :key="cat.id" :value="cat.id">
-                {{ cat.name }}
-              </option>
-            </select>
-            <ChevronDown class="select-arrow-icon" />
           </div>
         </div>
 
@@ -3459,56 +3445,50 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Mobile Category Select Dropdown */
-.skills-mobile-select-wrapper {
-  display: none;
-}
-
 @media (max-width: 768px) {
-  .skills-filter-tabs.d-desktop-only {
-    display: none !important;
+  .skills-top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 8px;
   }
 
-  .skills-mobile-select-wrapper {
+  .skills-filter-tabs {
+    width: 100%;
     display: flex;
-    align-items: center;
-    position: relative;
-    width: 100%;
-    margin-bottom: 6px;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
 
-  .skills-mobile-select {
-    width: 100%;
-    background: rgba(8, 12, 22, 0.85);
-    border: 1px solid rgba(6, 182, 212, 0.3);
-    color: var(--accent-cyan);
-    font-family: var(--font-display);
-    font-size: 0.78rem;
+  .skills-filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .skills-tab-btn {
+    flex-shrink: 0;
+    font-size: 0.68rem;
     font-weight: 700;
-    padding: 8px 32px 8px 12px;
-    border-radius: 8px;
-    appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-    box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+    padding: 6px 12px;
+    border-radius: 18px;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .skills-mobile-select option {
-    background: #080d1a;
+  .skills-tab-btn.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(6, 182, 212, 0.35));
+    border-color: var(--accent-cyan);
     color: #ffffff;
-  }
-
-  .select-arrow-icon {
-    position: absolute;
-    right: 10px;
-    width: 16px;
-    height: 16px;
-    color: var(--accent-cyan);
-    pointer-events: none;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
   }
 
   .skills-section {
-    padding: 16px 14px !important;
+    padding: 12px 14px !important;
     height: 100vh;
     height: 100dvh;
     max-height: 100vh;
@@ -3522,14 +3502,16 @@ onBeforeUnmount(() => {
 
   .skills-panel {
     padding: 14px 12px;
-    max-height: calc(100vh - 65px);
-    max-height: calc(100dvh - 65px);
+    max-height: calc(100vh - 55px);
+    max-height: calc(100dvh - 55px);
     display: flex;
     flex-direction: column;
+    justify-content: center;
   }
 
   .skills-slider-track {
-    max-height: 380px;
+    max-height: calc(100vh - 180px);
+    max-height: calc(100dvh - 180px);
     overflow-y: auto;
     padding-right: 4px;
     -webkit-overflow-scrolling: touch;
@@ -3541,27 +3523,38 @@ onBeforeUnmount(() => {
   }
 
   .skill-brand-card {
-    min-height: 44px;
+    min-height: 46px;
     padding: 8px 10px;
     gap: 8px;
+    border-radius: 10px;
+    background: rgba(13, 17, 28, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .skill-brand-card.active,
+  .skill-brand-card:hover {
+    border-color: var(--brand-color, var(--accent-cyan));
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.25);
   }
 
   .skill-brand-icon-wrapper {
     width: 26px;
     height: 26px;
+    flex-shrink: 0;
   }
 
   .skill-brand-name {
     font-size: 0.72rem;
+    font-weight: 700;
   }
 
   .skill-level-num {
     font-size: 0.65rem;
+    font-weight: 700;
   }
 
   .skill-tag-pill {
-    font-size: 0.52rem;
-    padding: 0 4px;
+    display: none;
   }
 
   .skills-arrow-btn {
