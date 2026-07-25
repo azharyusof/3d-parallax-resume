@@ -929,9 +929,9 @@ const handleOnline = () => { isOnlineStatus.value = true }
 const handleOffline = () => { isOnlineStatus.value = false }
 
 const liveDiagnostics = computed(() => [
-  { label: 'CORE_STATUS', value: isOnlineStatus.value ? 'ONLINE' : 'OFFLINE', isOnline: isOnlineStatus.value },
-  { label: 'UPTIME', value: realUptime.value, isOnline: true },
-  { label: 'SYS_LOAD', value: realSysLoad.value, isOnline: true }
+  { label: 'CORE_STATUS: ', value: isOnlineStatus.value ? 'ONLINE' : 'OFFLINE', isOnline: isOnlineStatus.value },
+  { label: 'UPTIME: ', value: realUptime.value, isOnline: true },
+  { label: 'SYS_LOAD: ', value: realSysLoad.value, isOnline: true }
 ])
 
 const runTypingEffect = () => {
@@ -3095,8 +3095,8 @@ onBeforeUnmount(() => {
     padding-bottom: 8px;
   }
   .avatar-wrapper {
-    width: 105px;
-    height: 105px;
+    width: 150px;
+    height: 150px;
     margin: 0 auto 10px auto;
   }
   .avatar-img {
@@ -3148,9 +3148,9 @@ onBeforeUnmount(() => {
     margin-top: 2px;
   }
   .terminal-text-box {
-    height: 155px;
-    min-height: 155px;
-    max-height: 155px;
+    height: 180px;
+    min-height: 180px;
+    max-height: 180px;
     margin-bottom: 10px;
   }
   .terminal-code {
