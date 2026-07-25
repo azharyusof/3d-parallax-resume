@@ -1,5 +1,7 @@
 export const heroData = {
   name: 'NOOR AZHAR BIN MOHD YUSOF',
+  titlePrimary: 'SENIOR SOFTWARE ENGINEER',
+  titleSecondary: '(APPLICATION IN CLOUD & DEVOPS)',
   title: 'SENIOR SOFTWARE ENGINEER (APPLICATION IN CLOUD & DEVOPS)',
   availability: 'Available for Hire',
   location: 'Selangor | Kuala Lumpur, MY',

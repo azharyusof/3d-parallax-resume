@@ -81,13 +81,26 @@
           <div class="hero-content-pane">
             <!-- <div class="panel-tag">// SYS_ACCESS_GRANTED</div> -->
             <h1 class="hero-name text-gradient">{{ heroData.name }}</h1>
-            <h2 class="hero-title text-glow">{{ heroData.title }}</h2>
+            <h2 class="hero-title text-glow">
+              <span class="title-primary">{{ heroData.titlePrimary || 'SENIOR SOFTWARE ENGINEER' }}</span>
+              <span class="title-secondary">{{ heroData.titleSecondary || '(APPLICATION IN CLOUD & DEVOPS)' }}</span>
+            </h2>
 
             <div class="terminal-text-box">
-              <Terminal class="box-icon" />
-              <p ref="terminalCodeRef" class="terminal-code">
-                <span class="code-accent"></span>{{ typingText }}<span class="cursor-blink">_</span>
-              </p>
+              <div class="terminal-header-bar">
+                <div class="terminal-dots">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                </div>
+                <span class="terminal-title">bash -- 80x24</span>
+              </div>
+              <div class="terminal-body">
+                <Terminal class="box-icon" />
+                <p ref="terminalCodeRef" class="terminal-code">
+                  <span class="code-accent"></span>{{ typingText }}<span class="cursor-blink">_</span>
+                </p>
+              </div>
             </div>
 
             <div class="hero-action-row">
@@ -1499,32 +1512,81 @@ onBeforeUnmount(() => {
 }
 
 .hero-title {
-  font-size: 1.05rem;
-  color: var(--accent-cyan);
-  font-weight: 500;
-  letter-spacing: 0.05em;
   margin-bottom: 20px;
+}
+
+.hero-title .title-primary {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  letter-spacing: 0.05em;
+}
+
+.hero-title .title-secondary {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(99, 102, 241, 0.95);
+  margin-top: 3px;
+  letter-spacing: 0.04em;
 }
 
 /* --- Terminal Text Box — fixed height so typing text never shifts layout --- */
 .terminal-text-box {
-  background: rgba(0, 0, 0, 0.50);
-  border: 1px solid rgba(6, 182, 212, 0.12);
-  padding: 18px 20px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(6, 182, 212, 0.16);
   border-radius: 10px;
   text-align: left;
   font-family: var(--font-display);
   margin-bottom: 25px;
   display: flex;
-  gap: 12px;
-  /* FIXED height prevents reflow when typing text expands */
-  height: 120px;
-  min-height: 120px;
-  max-height: 120px;
+  flex-direction: column;
+  height: 140px;
+  min-height: 140px;
+  max-height: 140px;
   width: 100%;
   overflow: hidden;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(6, 182, 212, 0.06);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(6, 182, 212, 0.08);
   position: relative;
+}
+
+.terminal-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.terminal-dots .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.terminal-dots .dot.red { background: #ff5f56; }
+.terminal-dots .dot.yellow { background: #ffbd2e; }
+.terminal-dots .dot.green { background: #27c93f; }
+
+.terminal-title {
+  font-size: 0.62rem;
+  color: var(--text-dark);
+  font-family: monospace;
+}
+
+.terminal-body {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  flex: 1;
+  overflow: hidden;
 }
 
 /* Blinking cursor line at the top of the terminal */
@@ -2987,42 +3049,39 @@ onBeforeUnmount(() => {
     display: none !important;
   }
   .hero-section {
-    padding: 10px 12px !important;
+    padding: 12px 14px !important;
     height: 100vh;
     height: 100dvh;
     max-height: 100vh;
     max-height: 100dvh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     box-sizing: border-box;
     overflow: hidden;
+    gap: 6px;
   }
   .hero-card-wrapper {
-    flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100%;
     min-height: 0;
   }
   .hero-panel {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 18px 16px;
-    gap: 12px;
-    min-height: calc(100vh - 45px);
-    min-height: calc(100dvh - 45px);
-    max-height: calc(100vh - 35px);
-    max-height: calc(100dvh - 35px);
+    padding: 16px 14px;
+    gap: 10px;
+    min-height: auto;
+    max-height: calc(100vh - 65px);
+    max-height: calc(100dvh - 65px);
     width: 100%;
     overflow-y: auto;
     box-sizing: border-box;
-    display: flex;
-    justify-content: space-between;
   }
   .hero-profile-pane {
     width: 100%;
@@ -3036,9 +3095,9 @@ onBeforeUnmount(() => {
     padding-bottom: 8px;
   }
   .avatar-wrapper {
-    width: 85px;
-    height: 85px;
-    margin: 0 auto 8px auto;
+    width: 105px;
+    height: 105px;
+    margin: 0 auto 10px auto;
   }
   .avatar-img {
     width: 100%;
@@ -3071,28 +3130,32 @@ onBeforeUnmount(() => {
     align-items: center;
   }
   .hero-name {
-    font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+    font-size: clamp(1.15rem, 4.8vw, 1.45rem);
     text-align: center;
     white-space: normal;
     margin-bottom: 2px;
   }
   .hero-title {
-    font-size: 0.75rem;
-    text-align: center;
-    line-height: 1.3;
     margin-bottom: 8px;
+    text-align: center;
+  }
+  .hero-title .title-primary {
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+  .hero-title .title-secondary {
+    font-size: 0.72rem;
+    margin-top: 2px;
   }
   .terminal-text-box {
-    height: 130px;
-    min-height: 130px;
-    max-height: 130px;
-    padding: 12px 14px;
-    margin-bottom: 12px;
-    gap: 8px;
+    height: 155px;
+    min-height: 155px;
+    max-height: 155px;
+    margin-bottom: 10px;
   }
   .terminal-code {
-    font-size: 0.8rem;
-    line-height: 1.45;
+    font-size: 0.78rem;
+    line-height: 1.4;
   }
   .hero-action-row {
     flex-direction: row;
@@ -3112,8 +3175,8 @@ onBeforeUnmount(() => {
     justify-content: center;
   }
   .scroll-prompt {
-    margin-top: 4px;
-    padding: 2px 0;
+    margin-top: 6px;
+    padding: 0;
   }
   .scroll-prompt .prompt-text {
     font-size: 0.58rem;
@@ -3161,28 +3224,26 @@ onBeforeUnmount(() => {
     display: none !important;
   }
   .hero-panel {
-    padding: 14px 12px;
-    gap: 10px;
-    min-height: calc(100vh - 40px);
-    min-height: calc(100dvh - 40px);
-    max-height: calc(100vh - 30px);
-    max-height: calc(100dvh - 30px);
+    padding: 12px 10px;
+    gap: 8px;
+    min-height: auto;
+    max-height: calc(100vh - 60px);
+    max-height: calc(100dvh - 60px);
   }
   .avatar-wrapper {
-    width: 75px;
-    height: 75px;
-    margin: 0 auto 6px auto;
+    width: 95px;
+    height: 95px;
+    margin: 0 auto 8px auto;
   }
   .avatar-img {
     width: 100%;
     height: 100%;
   }
   .terminal-text-box {
-    height: 120px;
-    min-height: 120px;
-    max-height: 120px;
-    padding: 10px 12px;
-    margin-bottom: 10px;
+    height: 145px;
+    min-height: 145px;
+    max-height: 145px;
+    margin-bottom: 8px;
   }
   .terminal-code {
     font-size: 0.78rem;
