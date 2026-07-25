@@ -393,7 +393,12 @@
           <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
 
-        <div class="album-slider-perspective">
+        <div 
+          class="album-slider-perspective"
+          @touchstart="onProjTouchStart"
+          @touchmove="onProjTouchMove"
+          @touchend="onProjTouchEnd"
+        >
           <div class="album-slider-track">
             <div 
               v-for="(proj, idx) in filteredProjects" 
@@ -888,6 +893,44 @@ const nextSlide = () => {
   if (activeIndex.value < filteredProjects.value.length - 1) {
     activeIndex.value++
     playClick()
+  }
+}
+
+// Project section touch swipe gesture
+let projTouchStartX = 0
+let projTouchStartY = 0
+let projIsSwiping = false
+
+const onProjTouchStart = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    projIsSwiping = true
+    projTouchStartX = e.touches[0].clientX
+    projTouchStartY = e.touches[0].clientY
+  }
+}
+
+const onProjTouchMove = (e) => {
+  if (!projIsSwiping || !e.touches || e.touches.length === 0) return
+  const dx = e.touches[0].clientX - projTouchStartX
+  const dy = e.touches[0].clientY - projTouchStartY
+  // Prevent page scroll when swiping horizontally
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+    e.preventDefault()
+  }
+}
+
+const onProjTouchEnd = (e) => {
+  if (!projIsSwiping) return
+  projIsSwiping = false
+  if (!e.changedTouches || e.changedTouches.length === 0) return
+  const dx = e.changedTouches[0].clientX - projTouchStartX
+  const dy = e.changedTouches[0].clientY - projTouchStartY
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 35) {
+    if (dx < 0) {
+      nextSlide()
+    } else {
+      prevSlide()
+    }
   }
 }
 
