@@ -81,10 +81,7 @@
           <div class="hero-content-pane">
             <!-- <div class="panel-tag">// SYS_ACCESS_GRANTED</div> -->
             <h1 class="hero-name text-gradient">{{ heroData.name }}</h1>
-            <h2 class="hero-title text-glow">
-              <span class="title-primary">{{ heroData.titlePrimary || 'SENIOR SOFTWARE ENGINEER' }}</span>
-              <span class="title-secondary">{{ heroData.titleSecondary || '(APPLICATION IN CLOUD & DEVOPS)' }}</span>
-            </h2>
+            <h2 class="hero-title text-glow">{{ heroData.title }}</h2>
 
             <div class="terminal-text-box">
               <div class="terminal-header-bar">
@@ -1512,24 +1509,11 @@ onBeforeUnmount(() => {
 }
 
 .hero-title {
-  margin-bottom: 20px;
-}
-
-.hero-title .title-primary {
-  display: block;
   font-size: 1.05rem;
-  font-weight: 700;
   color: var(--accent-cyan);
-  letter-spacing: 0.05em;
-}
-
-.hero-title .title-secondary {
-  display: block;
-  font-size: 0.82rem;
   font-weight: 500;
-  color: rgba(99, 102, 241, 0.95);
-  margin-top: 3px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
 }
 
 /* --- Terminal Text Box — fixed height so typing text never shifts layout --- */
@@ -3048,27 +3032,6 @@ onBeforeUnmount(() => {
   .hud-header {
     display: none !important;
   }
-  .about-section {
-    padding-top: 15px !important;
-    padding-bottom: 10px !important;
-    padding-left: 3% !important;
-    padding-right: 3% !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    height: 100vh;
-    height: 100dvh;
-    max-height: 100vh;
-    max-height: 100dvh;
-    overflow: hidden;
-  }
-  .about-section .section-header {
-    margin-bottom: 4px !important;
-    margin-top: 0 !important;
-    text-align: center;
-  }
-  .about-section .section-title {
-    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
-  }
   .hero-section {
     padding: 12px 14px !important;
     height: 100vh;
@@ -3157,16 +3120,10 @@ onBeforeUnmount(() => {
     margin-bottom: 2px;
   }
   .hero-title {
-    margin-bottom: 8px;
+    font-size: 0.85rem;
     text-align: center;
-  }
-  .hero-title .title-primary {
-    font-size: 0.88rem;
-    line-height: 1.25;
-  }
-  .hero-title .title-secondary {
-    font-size: 0.72rem;
-    margin-top: 2px;
+    line-height: 1.4;
+    margin-bottom: 8px;
   }
   .terminal-text-box {
     height: 180px;
