@@ -85,7 +85,7 @@
 
             <div class="terminal-text-box">
               <Terminal class="box-icon" />
-              <p class="terminal-code">
+              <p ref="terminalCodeRef" class="terminal-code">
                 <span class="code-accent"></span>{{ typingText }}<span class="cursor-blink">_</span>
               </p>
             </div>
@@ -880,6 +880,7 @@ const onCertChange = (idx) => {
 
 const fullTypingText = heroData.bioTypingText
 const typingText = ref('')
+const terminalCodeRef = ref(null)
 
 const runTypingEffect = () => {
   let index = 0
@@ -887,6 +888,9 @@ const runTypingEffect = () => {
     if (index < fullTypingText.length) {
       typingText.value += fullTypingText[index]
       index++
+      if (terminalCodeRef.value) {
+        terminalCodeRef.value.scrollTop = terminalCodeRef.value.scrollHeight
+      }
     } else {
       clearInterval(interval)
     }
@@ -1499,6 +1503,29 @@ onMounted(() => {
   color: var(--text-main);
   font-size: 0.85rem;
   line-height: 1.5;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100%;
+  padding-right: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.terminal-code::-webkit-scrollbar {
+  width: 4px;
+}
+
+.terminal-code::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.terminal-code::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.35);
+  border-radius: 2px;
+}
+
+.terminal-code::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
 }
 
 .code-accent {
@@ -2908,57 +2935,141 @@ onMounted(() => {
     display: none !important;
   }
   .hud-header {
-    padding: 12px 18px;
+    display: none !important;
   }
-  .hud-logo .logo-text {
-    font-size: 0.95rem;
+  .hero-section {
+    padding: 12px 14px !important;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .hero-card-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
   }
   .hero-panel {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 22px 16px;
-    gap: 18px;
+    padding: 14px 14px;
+    gap: 10px;
     min-height: auto;
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
+    width: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
   }
   .hero-profile-pane {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     border-right: none;
     padding-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 20px;
+    padding-bottom: 8px;
+  }
+  .avatar-wrapper {
+    width: 85px;
+    height: 85px;
+    margin: 0 auto 8px auto;
+  }
+  .avatar-img {
+    width: 100%;
+    height: 100%;
   }
   .hero-panel .hero-badges {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 6px;
+    margin-bottom: 6px;
   }
   .hero-panel .hero-badges .badge {
     justify-content: center;
+    padding: 3px 8px;
+    font-size: 0.65rem;
+  }
+  .hero-diagnostics {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 4px 8px;
+    gap: 6px;
+    font-size: 0.6rem;
+  }
+  .hero-content-pane {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .hero-name {
-    font-size: clamp(1.15rem, 5vw, 1.7rem);
+    font-size: clamp(1.1rem, 4.5vw, 1.4rem);
     text-align: center;
     white-space: normal;
+    margin-bottom: 2px;
   }
   .hero-title {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     text-align: center;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .terminal-text-box {
+    height: 90px;
+    min-height: 90px;
+    max-height: 90px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+  .terminal-code {
+    font-size: 0.78rem;
     line-height: 1.4;
   }
   .hero-action-row {
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    gap: 8px;
     width: 100%;
   }
   .hero-action-row .action-btn-primary,
   .hero-action-row .action-btn-secondary {
-    width: 100%;
+    flex: 1;
+    width: auto;
     text-align: center;
-    min-height: 44px;
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 0.72rem;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  .scroll-prompt {
+    margin-top: 4px;
+    padding: 2px 0;
+  }
+  .scroll-prompt .prompt-text {
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+  }
+  .scroll-prompt .prompt-arrow {
+    margin-top: 2px;
+    width: 12px;
+    height: 12px;
   }
   .skills-top-bar {
     flex-direction: column;
@@ -2994,18 +3105,33 @@ onMounted(() => {
 
 @media (max-width: 480px) {
   .hud-header {
-    padding: 10px 14px;
+    display: none !important;
   }
   .hero-panel {
-    padding: 18px 12px;
+    padding: 10px 10px;
+    gap: 8px;
   }
   .avatar-wrapper {
-    width: 110px;
-    height: 110px;
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 6px auto;
   }
   .avatar-img {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: 100%;
+  }
+  .terminal-text-box {
+    height: 85px;
+    min-height: 85px;
+    max-height: 85px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  .hero-action-row .action-btn-primary,
+  .hero-action-row .action-btn-secondary {
+    padding: 6px 8px;
+    font-size: 0.7rem;
+    min-height: 36px;
   }
   .horizontal-nav-timeline {
     padding: 0 5px;
